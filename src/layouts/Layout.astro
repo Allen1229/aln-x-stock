@@ -7,11 +7,35 @@ import { SITE } from '@/config/site';
 interface Props {
   title?: string;
   description?: string;
+  /** 文章專用：覆寫預設 og:image */
+  ogImage?: string;
+  /** og:type，預設 website；文章頁傳 article */
+  ogType?: 'website' | 'article';
+  /** 文章專用：發佈時間 (ISO 字串) */
+  publishedTime?: string;
+  /** 文章專用：修改時間 (ISO 字串) */
+  modifiedTime?: string;
+  /** JSON-LD 結構化資料 */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** 是否禁止搜尋引擎索引 */
+  noindex?: boolean;
 }
 
-const { title, description = SITE.description } = Astro.props;
+const {
+  title,
+  description = SITE.description,
+  ogImage,
+  ogType = 'website',
+  publishedTime,
+  modifiedTime,
+  jsonLd,
+  noindex = false,
+} = Astro.props;
+
 const pageTitle = title ? `${title} | ${SITE.shortTitle}` : SITE.title;
 const canonical = new URL(Astro.url.pathname, SITE.url).toString();
+const ogImageUrl = new URL(ogImage ?? SITE.ogImage, SITE.url).toString();
+const rssUrl = new URL('/rss.xml', SITE.url).toString();
 ---
 
 <!doctype html>
@@ -22,13 +46,42 @@ const canonical = new URL(Astro.url.pathname, SITE.url).toString();
     <meta name="generator" content={Astro.generator} />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    <meta name="keywords" content={SITE.keywords.join(', ')} />
+    <meta name="author" content={SITE.author} />
+    {noindex
+      ? <meta name="robots" content="noindex, nofollow" />
+      : <meta name="robots" content="index, follow, max-image-preview:large" />
+    }
     <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph -->
+    <meta property="og:site_name" content={SITE.title} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={SITE.locale} />
+    {publishedTime && <meta property="article:published_time" content={publishedTime} />}
+    {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
+    {ogType === 'article' && <meta property="article:author" content={SITE.author} />}
+
+    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <!-- RSS -->
+    <link rel="alternate" type="application/rss+xml" title={`${SITE.shortTitle} RSS`} href={rssUrl} />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    {jsonLd && (
+      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    )}
   </head>
   <body class="min-h-screen flex flex-col">
     <Header />

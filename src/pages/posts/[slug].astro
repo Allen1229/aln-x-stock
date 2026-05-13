@@ -6,6 +6,7 @@ import CommentForm from '@/components/CommentForm.astro';
 import { formatDate } from '@/lib/format';
 import { getPostBySlug, parseList, renderMarkdown } from '@/lib/posts';
 import OutcomeIcon from '@/components/OutcomeIcon.astro';
+import { SITE } from '@/config/site';
 
 export const prerender = false;
 
@@ -27,6 +28,38 @@ const tickers = parseList(post.tickers);
 
 const turnstileSiteKey = env?.TURNSTILE_SITE_KEY;
 
+const publishedISO = new Date(post.published_at * 1000).toISOString();
+const modifiedISO = new Date((post.updated_at || post.published_at) * 1000).toISOString();
+const postUrl = new URL(`/posts/${post.slug}`, SITE.url).toString();
+const articleDescription = post.description || `${post.title} - ${SITE.author}的台股操作紀錄`;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.title,
+  description: articleDescription,
+  url: postUrl,
+  datePublished: publishedISO,
+  dateModified: modifiedISO,
+  inLanguage: 'zh-Hant-TW',
+  keywords: [...tickers, ...parseList(post.tags)].join(', '),
+  author: {
+    '@type': 'Person',
+    name: SITE.author,
+    url: SITE.url,
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: SITE.title,
+    url: SITE.url,
+  },
+  mainEntityOfPage: {
+    '@type': 'WebPage',
+    '@id': postUrl,
+  },
+  image: new URL(SITE.ogImage, SITE.url).toString(),
+};
+
 const r = await db
   .prepare('SELECT id, author, body, created_at FROM comments WHERE post_id = ? ORDER BY created_at DESC')
   .bind(post.id)
@@ -34,7 +67,14 @@ const r = await db
 const comments = r.results ?? [];
 ---
 
-<Layout title={post.title} description={post.description}>
+<Layout
+  title={post.title}
+  description={articleDescription}
+  ogType="article"
+  publishedTime={publishedISO}
+  modifiedTime={modifiedISO}
+  jsonLd={jsonLd}
+>
   <article class="mb-10">
     <header class="mb-6 pb-6 border-b border-border">
       <h1 class="text-3xl font-bold mb-3 flex items-center gap-3 flex-wrap">

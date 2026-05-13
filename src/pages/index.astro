@@ -6,11 +6,40 @@ import PinIcon from '@/components/PinIcon.astro';
 import OutcomeIcon from '@/components/OutcomeIcon.astro';
 import { formatDate, daysAgo, relativeDateZh } from '@/lib/format';
 import { listPosts, parseList } from '@/lib/posts';
+import { SITE } from '@/config/site';
 
 export const prerender = false;
 
 const db = Astro.locals.runtime?.env?.DB;
 const rawPosts = db ? await listPosts(db) : [];
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE.title,
+    url: SITE.url,
+    description: SITE.description,
+    inLanguage: 'zh-Hant-TW',
+    publisher: {
+      '@type': 'Person',
+      name: SITE.author,
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: SITE.title,
+    url: SITE.url,
+    blogPost: rawPosts.slice(0, 10).map((p) => ({
+      '@type': 'BlogPosting',
+      headline: p.title,
+      url: new URL(`/posts/${p.slug}`, SITE.url).toString(),
+      datePublished: new Date(p.published_at * 1000).toISOString(),
+      description: p.description,
+    })),
+  },
+];
 const posts = rawPosts.map((post, i) => {
   const ageDays = daysAgo(post.published_at * 1000);
   return {
@@ -24,7 +53,7 @@ const posts = rawPosts.map((post, i) => {
 });
 ---
 
-<Layout>
+<Layout jsonLd={jsonLd}>
   <Hero />
 
   <section class="mb-8">

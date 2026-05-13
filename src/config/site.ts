@@ -3,8 +3,11 @@ export const SITE = {
   url: import.meta.env.SITE_URL ?? 'https://aln-x-stock.pages.dev',
   title: '股海冥燈 - 艾倫大叔',
   shortTitle: '股海冥燈 - 艾倫大叔',
-  description: '股票市場上，常常是一個反指標 — 台股個股操作紀錄與心得分享',
-  author: 'Allen',
+  description: '股票市場上，常常是一個反指標 — 艾倫大叔的台股個股操作紀錄與心得分享，不報明牌，只分享真實的操作與檢討。',
+  keywords: ['台股', '個股操作', '投資紀錄', '股市心得', '艾倫大叔', '股海冥燈', '反指標'],
+  author: '艾倫大叔',
+  ogImage: '/hero/main.png',
+  locale: 'zh_TW',
   nav: [
     { href: '/', label: '首頁' },
     { href: '/about', label: '關於' },

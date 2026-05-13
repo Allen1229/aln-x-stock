@@ -8,9 +8,17 @@ const year = new Date().getFullYear();
     <p class="text-xs leading-relaxed">
       <span class="text-ink-dim">免責聲明：</span>{DISCLAIMER}
     </p>
-    <div class="flex justify-between items-center">
+    <div class="flex justify-between items-center flex-wrap gap-3">
       <span>© {year} {SITE.title}</span>
-      <a href="/privacy" class="text-ink-mute hover:text-ink no-underline">隱私權政策</a>
+      <div class="flex items-center gap-4">
+        <a href="/rss.xml" class="text-ink-mute hover:text-ink no-underline inline-flex items-center gap-1" title="RSS 訂閱">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3.5 h-3.5">
+            <path d="M3.429 5.1v2.4c7.248 0 13.114 5.867 13.114 13.114h2.4c0-8.571-6.943-15.514-15.514-15.514zM3.429 9.943v2.4c4.571 0 8.286 3.714 8.286 8.286h2.4c0-5.886-4.8-10.686-10.686-10.686zM6 17.143a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+          </svg>
+          RSS
+        </a>
+        <a href="/privacy" class="text-ink-mute hover:text-ink no-underline">隱私權政策</a>
+      </div>
     </div>
   </div>
 </footer>
