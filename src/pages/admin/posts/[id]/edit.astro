@@ -1,0 +1,28 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import PostForm from '@/components/PostForm.astro';
+import { isAdmin } from '@/lib/auth';
+import { getPostById } from '@/lib/posts';
+
+export const prerender = false;
+
+if (!(await isAdmin(Astro))) {
+  return Astro.redirect('/admin/login');
+}
+
+const id = Number(Astro.params.id);
+const db = Astro.locals.runtime?.env?.DB;
+if (!Number.isInteger(id) || id <= 0 || !db) {
+  return Astro.redirect('/admin');
+}
+
+const post = await getPostById(db, id);
+if (!post) return Astro.redirect('/admin');
+
+const error = Astro.url.searchParams.get('error') ?? undefined;
+---
+
+<Layout title={`編輯：${post.title}`}>
+  <h1 class="text-2xl font-bold mb-6">編輯文章</h1>
+  <PostForm post={post} action={`/api/admin/posts/${id}/update`} submitLabel="儲存變更" error={error} />
+</Layout>

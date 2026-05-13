@@ -1,0 +1,191 @@
+---
+import { formatDate } from '@/lib/format';
+import type { Post } from '@/lib/posts';
+
+interface Props {
+  post?: Post | null;
+  action: string;
+  submitLabel: string;
+  error?: string;
+}
+
+const { post, action, submitLabel, error } = Astro.props;
+
+const today = new Date();
+const defaultDate = post ? formatDate(post.published_at * 1000) : formatDate(today);
+---
+
+<form method="POST" action={action} class="space-y-4">
+  {error && (
+    <div class="border border-up/40 bg-up/10 text-up rounded p-3 text-sm">{error}</div>
+  )}
+
+  <div>
+    <label class="block text-sm text-ink-mute mb-1">標題 <span class="text-up">*</span></label>
+    <input
+      type="text"
+      name="title"
+      required
+      maxlength="120"
+      value={post?.title ?? ''}
+      class="w-full bg-bg-soft border border-border rounded px-3 py-2 text-ink focus:outline-none focus:border-accent"
+      placeholder="2330 台積電 操作紀錄"
+    />
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="block text-sm text-ink-mute mb-1">
+        網址識別 (slug)
+        <span class="text-ink-dim text-xs ml-1">留空會自動產生</span>
+      </label>
+      <input
+        type="text"
+        name="slug"
+        maxlength="80"
+        value={post?.slug ?? ''}
+        class="w-full bg-bg-soft border border-border rounded px-3 py-2 text-ink focus:outline-none focus:border-accent font-mono text-sm"
+        placeholder="例如 2330-tsmc-2026q2"
+      />
+    </div>
+    <div>
+      <label class="block text-sm text-ink-mute mb-1">發佈日期</label>
+      <input
+        type="date"
+        name="publishedAt"
+        required
+        value={defaultDate}
+        class="w-full bg-bg-soft border border-border rounded px-3 py-2 text-ink focus:outline-none focus:border-accent"
+      />
+    </div>
+  </div>
+
+  <div>
+    <label class="block text-sm text-ink-mute mb-1">摘要</label>
+    <input
+      type="text"
+      name="description"
+      maxlength="200"
+      value={post?.description ?? ''}
+      class="w-full bg-bg-soft border border-border rounded px-3 py-2 text-ink focus:outline-none focus:border-accent"
+      placeholder="這篇文章在講什麼（顯示在文章列表）"
+    />
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label class="block text-sm text-ink-mute mb-1">
+        個股代號
+        <span class="text-ink-dim text-xs ml-1">逗號分隔，例如 2330,2454</span>
+      </label>
+      <input
+        type="text"
+        name="tickers"
+        maxlength="200"
+        value={post?.tickers ?? ''}
+        class="w-full bg-bg-soft border border-border rounded px-3 py-2 text-ink focus:outline-none focus:border-accent"
+        placeholder="2330,2454"
+      />
+    </div>
+    <div>
+      <label class="block text-sm text-ink-mute mb-1">
+        標籤
+        <span class="text-ink-dim text-xs ml-1">逗號分隔</span>
+      </label>
+      <input
+        type="text"
+        name="tags"
+        maxlength="200"
+        value={post?.tags ?? ''}
+        class="w-full bg-bg-soft border border-border rounded px-3 py-2 text-ink focus:outline-none focus:border-accent"
+        placeholder="半導體,波段"
+      />
+    </div>
+  </div>
+
+  <div>
+    <label class="block text-sm text-ink-mute mb-1">
+      內容（Markdown）<span class="text-up">*</span>
+      <a href="https://markdown.tw/" target="_blank" class="text-xs ml-2 no-underline">Markdown 語法說明</a>
+    </label>
+    <textarea
+      name="body"
+      required
+      rows="20"
+      class="w-full bg-bg-soft border border-border rounded px-3 py-2 text-ink focus:outline-none focus:border-accent font-mono text-sm leading-relaxed resize-y"
+      placeholder={'## 進場理由\n\n- 進場價：NT$ 900\n- 目標價：NT$ 1,100\n\n## 進場依據\n\n...'}
+    >{post?.body ?? ''}</textarea>
+    <p class="text-xs text-ink-dim mt-1">支援標題 (##)、粗體 (**)、列表 (-)、連結、表格等 Markdown 語法</p>
+  </div>
+
+  <div class="flex items-center gap-6 flex-wrap">
+    <div class="flex items-center gap-2">
+      <input
+        type="checkbox"
+        name="draft"
+        id="draft"
+        value="1"
+        checked={post?.draft === 1}
+        class="bg-bg-soft border-border rounded text-accent focus:ring-accent"
+      />
+      <label for="draft" class="text-sm text-ink-mute">儲存為草稿（不公開顯示）</label>
+    </div>
+    <div class="flex items-center gap-2">
+      <input
+        type="checkbox"
+        name="pinned"
+        id="pinned"
+        value="1"
+        checked={!!post?.pinned_at}
+        class="bg-bg-soft border-border rounded text-accent focus:ring-accent"
+      />
+      <label for="pinned" class="text-sm text-ink-mute">置頂（多篇置頂時，最近勾選的會在最上）</label>
+    </div>
+  </div>
+
+  <div>
+    <span class="block text-sm text-ink-mute mb-2">操作結果</span>
+    <div class="flex items-center gap-5 flex-wrap">
+      <label class="flex items-center gap-2 text-sm cursor-pointer">
+        <input
+          type="radio"
+          name="outcome"
+          value=""
+          checked={!post?.outcome}
+          class="bg-bg-soft border-border text-accent focus:ring-accent"
+        />
+        <span class="text-ink-mute">未標記</span>
+      </label>
+      <label class="flex items-center gap-2 text-sm cursor-pointer">
+        <input
+          type="radio"
+          name="outcome"
+          value="profit"
+          checked={post?.outcome === 'profit'}
+          class="bg-bg-soft border-border text-up focus:ring-up"
+        />
+        <span class="text-up font-medium">獲利</span>
+      </label>
+      <label class="flex items-center gap-2 text-sm cursor-pointer">
+        <input
+          type="radio"
+          name="outcome"
+          value="loss"
+          checked={post?.outcome === 'loss'}
+          class="bg-bg-soft border-border text-down focus:ring-down"
+        />
+        <span class="text-down font-medium">虧損</span>
+      </label>
+    </div>
+  </div>
+
+  <div class="flex items-center justify-between pt-2 border-t border-border">
+    <a href="/admin" class="text-sm text-ink-mute hover:text-ink no-underline">← 返回</a>
+    <button
+      type="submit"
+      class="bg-accent hover:bg-accent-hover text-bg font-semibold px-5 py-2 rounded transition-colors"
+    >
+      {submitLabel}
+    </button>
+  </div>
+</form>

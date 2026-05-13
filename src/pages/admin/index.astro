@@ -1,0 +1,120 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { isAdmin } from '@/lib/auth';
+import PinIcon from '@/components/PinIcon.astro';
+import { formatDate, formatDateTime } from '@/lib/format';
+import { listPosts } from '@/lib/posts';
+
+export const prerender = false;
+
+if (!(await isAdmin(Astro))) {
+  return Astro.redirect('/admin/login');
+}
+
+const db = Astro.locals.runtime?.env?.DB;
+const posts = db ? await listPosts(db, { includeDrafts: true }) : [];
+
+let recentComments: Array<{
+  id: number;
+  post_id: number;
+  post_title: string;
+  post_slug: string;
+  author: string;
+  body: string;
+  ip: string | null;
+  country: string | null;
+  created_at: number;
+}> = [];
+if (db) {
+  const r = await db
+    .prepare(
+      `SELECT c.id, c.post_id, p.title AS post_title, p.slug AS post_slug,
+              c.author, c.body, c.ip, c.country, c.created_at
+       FROM comments c
+       LEFT JOIN posts p ON p.id = c.post_id
+       ORDER BY c.created_at DESC LIMIT 50`
+    )
+    .all();
+  recentComments = (r.results ?? []) as typeof recentComments;
+}
+---
+
+<Layout title="後台管理">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold">後台管理</h1>
+    <form method="POST" action="/api/admin/logout">
+      <button class="text-sm text-ink-mute hover:text-up no-underline">登出</button>
+    </form>
+  </div>
+
+  <section class="mb-10">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-lg font-semibold">文章列表（{posts.length}）</h2>
+      <a href="/admin/posts/new" class="bg-accent hover:bg-accent-hover text-bg font-semibold px-3 py-1.5 rounded text-sm no-underline">
+        + 新增文章
+      </a>
+    </div>
+    <ul class="space-y-2">
+      {posts.map((post) => (
+        <li class="flex items-center justify-between border border-border rounded p-3 bg-bg-card">
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              {post.pinned_at && <PinIcon class="w-4 h-4" />}
+              <a href={`/posts/${post.slug}`} class="font-medium no-underline" target="_blank">{post.title}</a>
+            </div>
+            <div class="text-xs text-ink-dim mt-0.5">
+              {formatDate(post.published_at * 1000)} · {post.slug}
+              {post.draft === 1 && <span class="ml-2 text-up">[草稿]</span>}
+            </div>
+          </div>
+          <div class="flex items-center gap-3 ml-3">
+            <a href={`/admin/posts/${post.id}/edit`} class="text-sm text-accent hover:text-accent-hover no-underline">編輯</a>
+            <form method="POST" action="/api/admin/posts/delete" onsubmit="return confirm('確定刪除這篇文章與所有留言？')" class="inline">
+              <input type="hidden" name="id" value={post.id} />
+              <button class="text-sm text-up hover:underline">刪除</button>
+            </form>
+          </div>
+        </li>
+      ))}
+      {posts.length === 0 && (
+        <li class="text-center text-ink-dim py-6 text-sm">尚無文章，點右上角新增</li>
+      )}
+    </ul>
+  </section>
+
+  <section>
+    <h2 class="text-lg font-semibold mb-3">最近留言（{recentComments.length}）</h2>
+    <ul class="space-y-2">
+      {recentComments.map((c) => (
+        <li class="border border-border rounded p-3 bg-bg-card">
+          <div class="flex items-center justify-between mb-1">
+            <div class="text-sm">
+              <span class="font-semibold">{c.author}</span>
+              <span class="text-ink-dim text-xs"> 於 </span>
+              <a href={`/posts/${c.post_slug}`} class="text-xs no-underline" target="_blank">
+                {c.post_title ?? '(已刪文章)'}
+              </a>
+            </div>
+            <div class="flex items-center gap-2">
+              <time class="text-xs text-ink-dim">{formatDateTime(c.created_at)}</time>
+              <form method="POST" action="/api/admin/delete-comment" onsubmit="return confirm('確定刪除這則留言？')">
+                <input type="hidden" name="id" value={c.id} />
+                <input type="hidden" name="redirect" value="/admin" />
+                <button class="text-xs text-up hover:underline">刪除</button>
+              </form>
+            </div>
+          </div>
+          <p class="text-sm text-ink-mute whitespace-pre-wrap break-words">{c.body}</p>
+          {(c.ip || c.country) && (
+            <div class="mt-2 text-[11px] text-ink-dim font-mono">
+              IP: {c.ip ?? '—'}{c.country ? ` · ${c.country}` : ''}
+            </div>
+          )}
+        </li>
+      ))}
+      {recentComments.length === 0 && (
+        <li class="text-center text-ink-dim py-6 text-sm">尚無留言</li>
+      )}
+    </ul>
+  </section>
+</Layout>

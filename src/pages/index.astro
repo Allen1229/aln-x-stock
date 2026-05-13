@@ -1,0 +1,107 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import AdBanner from '@/components/AdBanner.astro';
+import Hero from '@/components/Hero.astro';
+import PinIcon from '@/components/PinIcon.astro';
+import OutcomeIcon from '@/components/OutcomeIcon.astro';
+import { formatDate, daysAgo, relativeDateZh } from '@/lib/format';
+import { listPosts, parseList } from '@/lib/posts';
+
+export const prerender = false;
+
+const db = Astro.locals.runtime?.env?.DB;
+const rawPosts = db ? await listPosts(db) : [];
+const posts = rawPosts.map((post, i) => {
+  const ageDays = daysAgo(post.published_at * 1000);
+  return {
+    ...post,
+    tickerList: parseList(post.tickers),
+    ageDays,
+    isFresh: ageDays <= 0,
+    isRecent: ageDays <= 3,
+    isEven: i % 2 === 0,
+  };
+});
+---
+
+<Layout>
+  <Hero />
+
+  <section class="mb-8">
+    <h1 class="text-2xl font-bold mb-2">最新文章</h1>
+    <p class="text-ink-mute text-sm">個股操作紀錄與心得分享</p>
+  </section>
+
+  <ul class="space-y-4">
+    {posts.map((post) => (
+      <li class:list={[
+        'border rounded-lg p-5 hover:border-accent transition-colors relative',
+        post.pinned_at
+          ? 'border-accent/60'
+          : post.isFresh
+            ? 'border-up/60 shadow-[0_0_0_1px_rgba(239,68,68,0.15)]'
+            : post.isRecent
+              ? 'border-up/30'
+              : 'border-border',
+        post.isEven ? 'bg-bg-card' : 'bg-bg-soft',
+      ]}>
+        <a href={`/posts/${post.slug}`} class="no-underline block">
+          <div class="flex items-start gap-3 mb-2">
+            <h2 class="text-xl font-semibold text-ink flex items-start gap-2 min-w-0 flex-1 leading-snug">
+              {post.pinned_at && <PinIcon class="w-5 h-5 shrink-0 mt-0.5" />}
+              {post.isRecent && (
+                <span class:list={[
+                  'shrink-0 inline-flex items-center text-[10px] font-bold tracking-wider px-1.5 py-0.5 rounded mt-1',
+                  'bg-up text-white',
+                  post.isFresh && 'animate-pulse',
+                ]}>NEW</span>
+              )}
+              <span class="line-clamp-2 break-words">{post.title}</span>
+            </h2>
+            {post.outcome && <OutcomeIcon outcome={post.outcome} class="w-5 h-5 shrink-0 mt-1" />}
+          </div>
+          <div class="flex items-center gap-3 mb-2 flex-wrap">
+            <div class="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class:list={['w-4 h-4', post.isRecent ? 'text-up' : 'text-ink-dim']}>
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              {post.isRecent ? (
+                <Fragment>
+                  <span class="text-up font-semibold text-sm">{relativeDateZh(post.published_at * 1000)}</span>
+                  <span class="text-ink-dim text-xs">·</span>
+                  <time class="text-ink-dim text-xs">{formatDate(post.published_at * 1000)}</time>
+                </Fragment>
+              ) : (
+                <time class="text-ink-mute text-sm font-medium">{formatDate(post.published_at * 1000)}</time>
+              )}
+            </div>
+            {post.tickerList.length > 0 && (
+              <div class="flex gap-1.5">
+                {post.tickerList.map((t) => (
+                  <span class="px-1.5 py-0.5 rounded bg-bg-soft text-ink-mute text-xs">{t}</span>
+                ))}
+              </div>
+            )}
+            <span class="inline-flex items-center gap-1 text-xs text-ink-mute bg-bg-soft border border-border rounded-full px-2 py-0.5 ml-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              {post.comment_count}
+            </span>
+          </div>
+          {post.description && (
+            <p class="text-ink-mute text-sm leading-relaxed">{post.description}</p>
+          )}
+        </a>
+      </li>
+    ))}
+    {posts.length === 0 && (
+      <li class="text-center text-ink-mute py-12">尚無文章</li>
+    )}
+  </ul>
+
+  <AdBanner />
+</Layout>

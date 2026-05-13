@@ -1,0 +1,15 @@
+name = "aln-x-stock"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "./dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "aln-x-stock-db"
+database_id = "5f433bf2-18e5-42de-bc15-5e42e21bf804"
+
+# 部署後在 Cloudflare Pages 後台設定以下環境變數（標記為 Encrypt）：
+#   ADMIN_PASSWORD_HASH  - 用 `npm run hash <你的密碼>` 產生
+#   SESSION_SECRET       - 隨機 32 字元以上字串
+#   TURNSTILE_SITE_KEY   - Cloudflare Turnstile 公開金鑰（可選）
+#   TURNSTILE_SECRET_KEY - Cloudflare Turnstile 私密金鑰（可選）

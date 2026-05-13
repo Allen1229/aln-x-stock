@@ -1,0 +1,17 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { SITE, DISCLAIMER } from '@/config/site';
+---
+
+<Layout title="關於">
+  <article class="prose-article max-w-2xl">
+    <h1>關於 {SITE.title}</h1>
+    <p>這裡是 {SITE.author} 的台股操作紀錄。所有文章皆為個人經驗分享與檢討用途。</p>
+
+    <h2>免責聲明</h2>
+    <p>{DISCLAIMER}</p>
+
+    <h2>聯絡</h2>
+    <p>有任何意見可在文章底下留言。</p>
+  </article>
+</Layout>

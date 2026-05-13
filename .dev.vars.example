@@ -1,0 +1,12 @@
+# 本機開發環境變數（複製成 .dev.vars 後填入）
+# .dev.vars 已加入 .gitignore，不會被 commit
+
+# 用 `npm run hash <密碼>` 產生
+ADMIN_PASSWORD_HASH="paste-your-bcrypt-hash-here"
+
+# 隨機 32 字元以上字串
+SESSION_SECRET="replace-with-a-random-long-string-at-least-32-chars"
+
+# Cloudflare Turnstile（可選；不設定則略過驗證）
+TURNSTILE_SITE_KEY=""
+TURNSTILE_SECRET_KEY=""

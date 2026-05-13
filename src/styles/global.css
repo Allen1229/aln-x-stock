@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  color-scheme: dark;
+  font-size: 125%;
+}
+
+body {
+  @apply bg-bg text-ink font-sans antialiased;
+}
+
+a {
+  @apply text-accent hover:text-accent-hover transition-colors;
+}
+
+.prose-article {
+  @apply max-w-none text-ink leading-relaxed;
+}
+.prose-article h1,
+.prose-article h2,
+.prose-article h3 {
+  @apply text-ink font-semibold mt-8 mb-3;
+}
+.prose-article h1 { @apply text-3xl; }
+.prose-article h2 { @apply text-2xl border-b border-border pb-2; }
+.prose-article h3 { @apply text-xl; }
+.prose-article p { @apply my-4; }
+.prose-article ul { @apply list-disc pl-6 my-4 space-y-1; }
+.prose-article ol { @apply list-decimal pl-6 my-4 space-y-1; }
+.prose-article blockquote { @apply border-l-4 border-accent pl-4 italic text-ink-mute my-4; }
+.prose-article code { @apply bg-bg-soft px-1.5 py-0.5 rounded text-sm; }
+.prose-article pre { @apply bg-bg-soft p-4 rounded-lg overflow-x-auto my-4; }
+.prose-article pre code { @apply bg-transparent p-0; }
+.prose-article table { @apply w-full my-4 border-collapse; }
+.prose-article th, .prose-article td { @apply border border-border px-3 py-2; }
+.prose-article th { @apply bg-bg-soft; }
+.prose-article img { @apply rounded-lg my-4; }

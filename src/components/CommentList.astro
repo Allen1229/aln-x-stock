@@ -1,0 +1,32 @@
+---
+import { formatDateTime } from '@/lib/format';
+
+interface Comment {
+  id: number;
+  author: string;
+  body: string;
+  created_at: number;
+}
+
+interface Props {
+  comments: Comment[];
+}
+
+const { comments } = Astro.props;
+---
+
+<div class="space-y-3">
+  {comments.length === 0 ? (
+    <p class="text-ink-dim text-sm text-center py-6">還沒有留言，搶第一個！</p>
+  ) : (
+    comments.map((c) => (
+      <article class="border border-border rounded-lg p-4 bg-bg-card">
+        <header class="flex items-center justify-between mb-2">
+          <span class="font-semibold text-ink text-sm">{c.author}</span>
+          <time class="text-xs text-ink-dim">{formatDateTime(c.created_at)}</time>
+        </header>
+        <p class="text-ink text-sm whitespace-pre-wrap break-words">{c.body}</p>
+      </article>
+    ))
+  )}
+</div>

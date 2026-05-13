@@ -1,0 +1,73 @@
+---
+interface Props {
+  postId: number;
+  turnstileSiteKey?: string;
+}
+const { postId, turnstileSiteKey } = Astro.props;
+---
+
+<form id="comment-form" class="border border-border rounded-lg p-4 bg-bg-card space-y-3" data-post-id={postId}>
+  <div>
+    <label class="block text-xs text-ink-mute mb-1">暱稱</label>
+    <input
+      type="text"
+      name="author"
+      required
+      maxlength="32"
+      class="w-full bg-bg-soft border border-border rounded px-3 py-2 text-sm text-ink focus:outline-none focus:border-accent"
+      placeholder="路人甲"
+    />
+  </div>
+  <div>
+    <label class="block text-xs text-ink-mute mb-1">留言內容</label>
+    <textarea
+      name="body"
+      required
+      maxlength="2000"
+      rows="4"
+      class="w-full bg-bg-soft border border-border rounded px-3 py-2 text-sm text-ink focus:outline-none focus:border-accent resize-y"
+      placeholder="請理性發言，不要爆雷股價"
+    ></textarea>
+  </div>
+  {turnstileSiteKey && (
+    <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="dark"></div>
+  )}
+  <div class="flex justify-between items-center">
+    <span id="comment-msg" class="text-xs"></span>
+    <button
+      type="submit"
+      class="bg-accent hover:bg-accent-hover text-bg font-semibold px-4 py-2 rounded text-sm transition-colors"
+    >
+      送出留言
+    </button>
+  </div>
+</form>
+
+{turnstileSiteKey && (
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+)}
+
+<script>
+  const form = document.getElementById('comment-form') as HTMLFormElement | null;
+  const msg = document.getElementById('comment-msg');
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!msg) return;
+      msg.textContent = '送出中...';
+      msg.className = 'text-xs text-ink-mute';
+      const fd = new FormData(form);
+      fd.append('postId', form.dataset.postId ?? '');
+      const res = await fetch('/api/comments', { method: 'POST', body: fd });
+      if (res.ok) {
+        msg.textContent = '留言成功，重新整理中...';
+        msg.className = 'text-xs text-accent';
+        setTimeout(() => location.reload(), 600);
+      } else {
+        const data = await res.json().catch(() => ({ error: '送出失敗' }));
+        msg.textContent = data.error ?? '送出失敗';
+        msg.className = 'text-xs text-up';
+      }
+    });
+  }
+</script>

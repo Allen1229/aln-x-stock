@@ -1,0 +1,37 @@
+{
+  "name": "aln-x-stock",
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "wrangler pages dev ./dist",
+    "deploy": "astro build && wrangler pages deploy ./dist",
+    "db:init:local": "wrangler d1 execute aln-x-stock-db --local --file=./schema.sql",
+    "db:init:remote": "wrangler d1 execute aln-x-stock-db --remote --file=./schema.sql",
+    "db:seed:local": "wrangler d1 execute aln-x-stock-db --local --file=./seed.sql",
+    "db:seed:remote": "wrangler d1 execute aln-x-stock-db --remote --file=./seed.sql",
+    "db:migrate:local": "wrangler d1 execute aln-x-stock-db --local --file=./migrations/001_add_pinned.sql",
+    "db:migrate:remote": "wrangler d1 execute aln-x-stock-db --remote --file=./migrations/001_add_pinned.sql",
+    "db:migrate2:local": "wrangler d1 execute aln-x-stock-db --local --file=./migrations/002_add_ip_country.sql",
+    "db:migrate2:remote": "wrangler d1 execute aln-x-stock-db --remote --file=./migrations/002_add_ip_country.sql",
+    "db:migrate3:local": "wrangler d1 execute aln-x-stock-db --local --file=./migrations/003_add_outcome.sql",
+    "db:migrate3:remote": "wrangler d1 execute aln-x-stock-db --remote --file=./migrations/003_add_outcome.sql",
+    "db:backup": "wrangler d1 export aln-x-stock-db --remote --output=./backups/backup-$(date +%Y%m%d).sql",
+    "hash": "node scripts/hash-password.mjs",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^12.2.0",
+    "@astrojs/tailwind": "^5.1.4",
+    "astro": "^5.1.5",
+    "bcryptjs": "^2.4.3",
+    "marked": "^15.0.4",
+    "tailwindcss": "^3.4.17"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "typescript": "^5.7.2",
+    "wrangler": "^3.99.0"
+  }
+}

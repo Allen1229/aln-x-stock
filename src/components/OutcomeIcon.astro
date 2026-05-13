@@ -1,0 +1,31 @@
+---
+import type { Outcome } from '@/lib/posts';
+
+interface Props {
+  outcome: Outcome;
+  class?: string;
+  withLabel?: boolean;
+}
+
+const { outcome, class: className = 'w-4 h-4', withLabel = false } = Astro.props;
+
+if (!outcome) return null;
+
+// 台股慣例：紅漲綠跌（紅 = 獲利，綠 = 虧損）
+const isProfit = outcome === 'profit';
+const colorClass = isProfit ? 'text-up' : 'text-down';
+const label = isProfit ? '獲利' : '虧損';
+---
+
+<span class:list={['inline-flex items-center gap-1 font-semibold', colorClass]} title={label} aria-label={label}>
+  {isProfit ? (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class={className}>
+      <path d="M13 4a1 1 0 0 0 0 2h4.59l-7.3 7.29-3.59-3.58a1 1 0 0 0-1.41 0l-5 5a1 1 0 1 0 1.41 1.42L6 11.83l3.59 3.58a1 1 0 0 0 1.41 0L19 7.41V12a1 1 0 0 0 2 0V5a1 1 0 0 0-1-1h-7z"/>
+    </svg>
+  ) : (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class={className}>
+      <path d="M13 20a1 1 0 0 1 0-2h4.59l-7.3-7.29-3.59 3.58a1 1 0 0 1-1.41 0l-5-5a1 1 0 1 1 1.41-1.42L6 12.17l3.59-3.58a1 1 0 0 1 1.41 0L19 16.59V12a1 1 0 0 1 2 0v7a1 1 0 0 1-1 1h-7z"/>
+    </svg>
+  )}
+  {withLabel && <span class="text-xs">{label}</span>}
+</span>

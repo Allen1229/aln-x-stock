@@ -1,0 +1,23 @@
+---
+import { AD } from '@/config/site';
+if (!AD.enabled) return null;
+---
+
+<aside class="my-8 border border-amber-700/40 rounded-lg overflow-hidden bg-gradient-to-br from-amber-950/40 via-amber-900/15 to-bg-card relative">
+  <div class="absolute left-0 top-0 bottom-0 w-1 bg-amber-500/70"></div>
+  <div class="flex items-center justify-between px-3 py-1.5 bg-amber-950/40 border-b border-amber-700/30 pl-4">
+    <span class="text-[10px] uppercase tracking-wider text-amber-300/80 font-semibold">廣告 / Sponsored</span>
+  </div>
+  <a href={AD.linkUrl} target="_blank" class="flex flex-col sm:flex-row gap-4 p-4 pl-5 no-underline hover:bg-amber-900/10 transition-colors" rel="sponsored nofollow noopener">
+    <img
+      src={AD.imageUrl}
+      alt={AD.headline}
+      class="w-full sm:w-48 h-32 object-cover rounded bg-bg-soft"
+      loading="lazy"
+    />
+    <div class="flex-1">
+      <h3 class="text-ink font-semibold text-base mb-1">{AD.headline}</h3>
+      <p class="text-ink-mute text-sm leading-relaxed">{AD.body}</p>
+    </div>
+  </a>
+</aside>

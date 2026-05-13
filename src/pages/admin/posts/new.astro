@@ -1,0 +1,18 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import PostForm from '@/components/PostForm.astro';
+import { isAdmin } from '@/lib/auth';
+
+export const prerender = false;
+
+if (!(await isAdmin(Astro))) {
+  return Astro.redirect('/admin/login');
+}
+
+const error = Astro.url.searchParams.get('error') ?? undefined;
+---
+
+<Layout title="新增文章">
+  <h1 class="text-2xl font-bold mb-6">新增文章</h1>
+  <PostForm action="/api/admin/posts/create" submitLabel="發佈" error={error} />
+</Layout>

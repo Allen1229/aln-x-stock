@@ -1,0 +1,16 @@
+---
+import { SITE, DISCLAIMER } from '@/config/site';
+const year = new Date().getFullYear();
+---
+
+<footer class="border-t border-border bg-bg-soft mt-12">
+  <div class="max-w-5xl mx-auto px-4 py-6 text-sm text-ink-mute space-y-3">
+    <p class="text-xs leading-relaxed">
+      <span class="text-ink-dim">免責聲明：</span>{DISCLAIMER}
+    </p>
+    <div class="flex justify-between items-center">
+      <span>© {year} {SITE.title}</span>
+      <a href="/privacy" class="text-ink-mute hover:text-ink no-underline">隱私權政策</a>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,68 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import AdBanner from '@/components/AdBanner.astro';
+import CommentList from '@/components/CommentList.astro';
+import CommentForm from '@/components/CommentForm.astro';
+import { formatDate } from '@/lib/format';
+import { getPostBySlug, parseList, renderMarkdown } from '@/lib/posts';
+import OutcomeIcon from '@/components/OutcomeIcon.astro';
+
+export const prerender = false;
+
+const { slug } = Astro.params;
+const env = Astro.locals.runtime?.env;
+const db = env?.DB;
+
+if (!db || !slug) {
+  return Astro.redirect('/404');
+}
+
+const post = await getPostBySlug(db, slug);
+if (!post || post.draft) {
+  return Astro.redirect('/404');
+}
+
+const html = renderMarkdown(post.body);
+const tickers = parseList(post.tickers);
+
+const turnstileSiteKey = env?.TURNSTILE_SITE_KEY;
+
+const r = await db
+  .prepare('SELECT id, author, body, created_at FROM comments WHERE post_id = ? ORDER BY created_at DESC')
+  .bind(post.id)
+  .all<{ id: number; author: string; body: string; created_at: number }>();
+const comments = r.results ?? [];
+---
+
+<Layout title={post.title} description={post.description}>
+  <article class="mb-10">
+    <header class="mb-6 pb-6 border-b border-border">
+      <h1 class="text-3xl font-bold mb-3 flex items-center gap-3 flex-wrap">
+        <span>{post.title}</span>
+        {post.outcome && <OutcomeIcon outcome={post.outcome} class="w-7 h-7" withLabel />}
+      </h1>
+      <div class="flex items-center gap-3 text-xs text-ink-dim">
+        <time>{formatDate(post.published_at * 1000)}</time>
+        {tickers.length > 0 && (
+          <div class="flex gap-1.5">
+            {tickers.map((t) => (
+              <span class="px-1.5 py-0.5 rounded bg-bg-soft text-ink-mute">{t}</span>
+            ))}
+          </div>
+        )}
+      </div>
+    </header>
+
+    <div class="prose-article" set:html={html}></div>
+  </article>
+
+  <AdBanner />
+
+  <section class="mt-10">
+    <h2 class="text-xl font-bold mb-4">留言（{comments.length}）</h2>
+    <div class="mb-6">
+      <CommentForm postId={post.id} turnstileSiteKey={turnstileSiteKey} />
+    </div>
+    <CommentList comments={comments} />
+  </section>
+</Layout>

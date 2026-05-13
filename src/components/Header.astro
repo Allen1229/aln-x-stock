@@ -1,0 +1,25 @@
+---
+import { SITE } from '@/config/site';
+const path = Astro.url.pathname;
+---
+
+<header class="border-b border-border bg-bg-soft/60 backdrop-blur sticky top-0 z-30">
+  <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+    <a href="/" class="text-ink font-bold text-lg tracking-wide no-underline hover:text-accent">
+      {SITE.title}
+    </a>
+    <nav class="flex items-center gap-5 text-sm">
+      {SITE.nav.map((item) => (
+        <a
+          href={item.href}
+          class:list={[
+            'no-underline transition-colors',
+            path === item.href ? 'text-accent' : 'text-ink-mute hover:text-ink',
+          ]}
+        >
+          {item.label}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>
