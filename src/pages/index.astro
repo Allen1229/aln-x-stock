@@ -114,12 +114,21 @@ const posts = rawPosts.map((post, i) => {
                 ))}
               </div>
             )}
-            <span class="inline-flex items-center gap-1 text-xs text-ink-mute bg-bg-soft border border-border rounded-full px-2 py-0.5 ml-auto">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-              </svg>
-              {post.comment_count}
-            </span>
+            <div class="flex items-center gap-1.5 ml-auto">
+              <span class="inline-flex items-center gap-1 text-xs text-ink-mute bg-bg-soft border border-border rounded-full px-2 py-0.5" title={`累計 ${post.view_count} 次瀏覽`}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                {post.view_count}
+              </span>
+              <span class="inline-flex items-center gap-1 text-xs text-ink-mute bg-bg-soft border border-border rounded-full px-2 py-0.5" title={`${post.comment_count} 則留言`}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                {post.comment_count}
+              </span>
+            </div>
           </div>
           {post.description && (
             <p class="text-ink-mute text-sm leading-relaxed">{post.description}</p>

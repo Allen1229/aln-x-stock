@@ -13,6 +13,7 @@ export interface Post {
   draft: number;
   pinned_at: number | null;
   outcome: Outcome;
+  view_count: number;
   published_at: number;
   updated_at: number;
 }
@@ -27,6 +28,7 @@ export interface PostListItem {
   draft: number;
   pinned_at: number | null;
   outcome: Outcome;
+  view_count: number;
   published_at: number;
   comment_count: number;
 }
@@ -70,7 +72,7 @@ export async function listPosts(
   const r = await db
     .prepare(
       `SELECT p.id, p.slug, p.title, p.description, p.tickers, p.tags, p.draft,
-              p.pinned_at, p.outcome, p.published_at,
+              p.pinned_at, p.outcome, p.view_count, p.published_at,
               COUNT(c.id) AS comment_count
        FROM posts p
        LEFT JOIN comments c ON c.post_id = p.id
@@ -85,6 +87,14 @@ export async function listPosts(
 export async function getPostBySlug(db: D1Database, slug: string): Promise<Post | null> {
   const r = await db.prepare('SELECT * FROM posts WHERE slug = ?').bind(slug).first<Post>();
   return r ?? null;
+}
+
+export async function incrementViewCount(db: D1Database, id: number): Promise<number> {
+  const r = await db
+    .prepare('UPDATE posts SET view_count = view_count + 1 WHERE id = ? RETURNING view_count')
+    .bind(id)
+    .first<{ view_count: number }>();
+  return r?.view_count ?? 0;
 }
 
 export async function getPostById(db: D1Database, id: number): Promise<Post | null> {
