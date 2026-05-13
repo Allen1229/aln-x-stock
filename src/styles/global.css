@@ -11,6 +11,12 @@ body {
   @apply bg-bg text-ink font-sans antialiased;
 }
 
+input::placeholder,
+textarea::placeholder {
+  color: theme('colors.ink.dim');
+  opacity: 0.45;
+}
+
 a {
   @apply text-accent hover:text-accent-hover transition-colors;
 }
