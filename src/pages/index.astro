@@ -47,6 +47,7 @@ const posts = rawPosts.map((post, i) => {
   return {
     ...post,
     tickerList: parseList(post.tickers),
+    tagList: parseList(post.tags),
     ageDays,
     relative,            // 字串（今天/昨天/X 天前），或 null（10+ 天）
     isFresh: ageDays <= 0,
@@ -128,7 +129,14 @@ const posts = rawPosts.map((post, i) => {
               {post.tickerList.length > 0 && (
                 <div class="flex gap-1.5">
                   {post.tickerList.map((t) => (
-                    <span class="px-1.5 py-0.5 rounded bg-bg-soft text-ink-mute text-xs">{t}</span>
+                    <span class="px-1.5 py-0.5 rounded bg-bg-soft text-ink-mute text-xs font-mono">{t}</span>
+                  ))}
+                </div>
+              )}
+              {post.tagList.length > 0 && (
+                <div class="flex gap-1.5">
+                  {post.tagList.map((t) => (
+                    <span class="px-1.5 py-0.5 rounded-full border border-accent/40 text-accent/90 text-xs">#{t}</span>
                   ))}
                 </div>
               )}
