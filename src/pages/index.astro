@@ -89,7 +89,7 @@ const posts = rawPosts.map((post, i) => {
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3">
                       <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/>
                     </svg>
-                    新手必看
+                    歡迎光臨
                   </span>
                 )}
                 {!post.isIntro && post.pinned_at && <PinIcon class="w-5 h-5 shrink-0 mt-0.5" />}
@@ -161,5 +161,5 @@ const posts = rawPosts.map((post, i) => {
     )}
   </div>
 
-  {posts.length > 0 && posts.length % 4 !== 0 && <AdBanner />}
+  {posts.length > 0 && <AdBanner />}
 </Layout>
