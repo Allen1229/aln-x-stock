@@ -14,9 +14,11 @@ export function formatDateTime(d: Date | number): string {
   return `${base} ${h}:${mi}`;
 }
 
-/** 取得相對天數差（今天為 0，昨天為 1，依此類推；基於日曆日比較） */
+/** 取得相對天數差（今天為 0，昨天為 1，依此類推；基於日曆日比較）
+ * @param d 可傳 Date 物件或 unix 毫秒（注意：跟 formatDate 一致，是毫秒不是秒）
+ */
 export function daysAgo(d: Date | number): number {
-  const target = typeof d === 'number' ? new Date(d * 1000) : new Date(d);
+  const target = typeof d === 'number' ? new Date(d) : new Date(d);
   const startOfDay = (date: Date) =>
     new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
   const diffMs = startOfDay(new Date()) - startOfDay(target);
