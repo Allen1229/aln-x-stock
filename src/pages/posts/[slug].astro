@@ -7,6 +7,7 @@ import { formatDate } from '@/lib/format';
 import { getPostBySlug, parseList, renderMarkdown, incrementViewCount } from '@/lib/posts';
 import OutcomeIcon from '@/components/OutcomeIcon.astro';
 import { SITE } from '@/config/site';
+import { isAdmin } from '@/lib/auth';
 
 export const prerender = false;
 
@@ -19,15 +20,24 @@ if (!db || !slug) {
 }
 
 const post = await getPostBySlug(db, slug);
-if (!post || post.draft) {
+if (!post) {
+  return Astro.redirect('/404');
+}
+
+const viewerIsAdmin = await isAdmin(Astro);
+// 草稿只允許管理員預覽，一般訪客視同不存在
+if (post.draft && !viewerIsAdmin) {
   return Astro.redirect('/404');
 }
 
 let viewCount = post.view_count;
-try {
-  viewCount = await incrementViewCount(db, post.id);
-} catch {
-  // 累計失敗不影響頁面顯示
+// 草稿預覽 & 管理員瀏覽都不累計 view_count
+if (!post.draft && !viewerIsAdmin) {
+  try {
+    viewCount = await incrementViewCount(db, post.id);
+  } catch {
+    // 累計失敗不影響頁面顯示
+  }
 }
 
 const html = renderMarkdown(post.body);
@@ -80,8 +90,19 @@ const comments = r.results ?? [];
   ogType="article"
   publishedTime={publishedISO}
   modifiedTime={modifiedISO}
-  jsonLd={jsonLd}
+  jsonLd={post.draft ? undefined : jsonLd}
+  noindex={post.draft === 1}
 >
+  {post.draft === 1 && (
+    <div class="mb-6 border border-amber-500/50 bg-amber-950/30 text-amber-200 rounded-lg p-3 text-sm flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 shrink-0">
+        <path d="M12 9v4M12 17h.01"></path>
+        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+      </svg>
+      <span><strong>草稿預覽中</strong>：這篇文章為草稿狀態，一般訪客無法看到。發佈前可在後台取消「儲存為草稿」選項。</span>
+    </div>
+  )}
+
   <article class="mb-10">
     <header class="mb-6 pb-6 border-b border-border">
       <div class="flex items-start justify-between gap-4 mb-3">
