@@ -141,6 +141,17 @@ const defaultDate = post ? formatDate(post.published_at * 1000) : formatDate(tod
       />
       <label for="pinned" class="text-sm text-ink-mute">置頂（多篇置頂時，最近勾選的會在最上）</label>
     </div>
+    <div class="flex items-center gap-2">
+      <input
+        type="checkbox"
+        name="is_intro"
+        id="is_intro"
+        value="1"
+        checked={post?.is_intro === 1}
+        class="bg-bg-soft border-border rounded text-amber-400 focus:ring-amber-400"
+      />
+      <label for="is_intro" class="text-sm text-amber-300/90">新手導讀文（永遠置頂第一，只能有一篇）</label>
+    </div>
   </div>
 
   <div>

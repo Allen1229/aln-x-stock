@@ -13,6 +13,7 @@ export interface Post {
   draft: number;
   pinned_at: number | null;
   outcome: Outcome;
+  is_intro: number;
   view_count: number;
   published_at: number;
   updated_at: number;
@@ -28,6 +29,7 @@ export interface PostListItem {
   draft: number;
   pinned_at: number | null;
   outcome: Outcome;
+  is_intro: number;
   view_count: number;
   published_at: number;
   comment_count: number;
@@ -72,13 +74,15 @@ export async function listPosts(
   const r = await db
     .prepare(
       `SELECT p.id, p.slug, p.title, p.description, p.tickers, p.tags, p.draft,
-              p.pinned_at, p.outcome, p.view_count, p.published_at,
+              p.pinned_at, p.outcome, p.is_intro, p.view_count, p.published_at,
               COUNT(c.id) AS comment_count
        FROM posts p
        LEFT JOIN comments c ON c.post_id = p.id
        ${where}
        GROUP BY p.id
-       ORDER BY (p.pinned_at IS NOT NULL) DESC, p.pinned_at DESC, p.published_at DESC`
+       ORDER BY p.is_intro DESC,
+                (p.pinned_at IS NOT NULL) DESC, p.pinned_at DESC,
+                p.published_at DESC`
     )
     .all<PostListItem>();
   return r.results ?? [];
@@ -111,16 +115,26 @@ export interface PostInput {
   tags: string;
   draft: boolean;
   pinned: boolean;
+  isIntro: boolean;
   outcome: Outcome;
   publishedAt: number;
+}
+
+/** 將其他文章的 is_intro 全部清掉，確保只有一篇導讀文 */
+async function clearOtherIntros(db: D1Database, excludeId?: number): Promise<void> {
+  if (excludeId === undefined) {
+    await db.prepare('UPDATE posts SET is_intro = 0').run();
+  } else {
+    await db.prepare('UPDATE posts SET is_intro = 0 WHERE id != ?').bind(excludeId).run();
+  }
 }
 
 export async function createPost(db: D1Database, input: PostInput): Promise<number> {
   const pinnedAt = input.pinned ? Math.floor(Date.now() / 1000) : null;
   const r = await db
     .prepare(
-      `INSERT INTO posts (slug, title, description, body, tickers, tags, draft, pinned_at, outcome, published_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`
+      `INSERT INTO posts (slug, title, description, body, tickers, tags, draft, pinned_at, outcome, is_intro, published_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id`
     )
     .bind(
       input.slug,
@@ -132,10 +146,13 @@ export async function createPost(db: D1Database, input: PostInput): Promise<numb
       input.draft ? 1 : 0,
       pinnedAt,
       input.outcome,
+      input.isIntro ? 1 : 0,
       input.publishedAt
     )
     .first<{ id: number }>();
-  return r!.id;
+  const id = r!.id;
+  if (input.isIntro) await clearOtherIntros(db, id);
+  return id;
 }
 
 export async function updatePost(
@@ -155,7 +172,7 @@ export async function updatePost(
     pinnedBind = null;
   }
 
-  const sql = `UPDATE posts SET slug=?, title=?, description=?, body=?, tickers=?, tags=?, draft=?, pinned_at=${pinnedExpr}, outcome=?, published_at=?, updated_at=unixepoch() WHERE id=?`;
+  const sql = `UPDATE posts SET slug=?, title=?, description=?, body=?, tickers=?, tags=?, draft=?, pinned_at=${pinnedExpr}, outcome=?, is_intro=?, published_at=?, updated_at=unixepoch() WHERE id=?`;
 
   const binds: (string | number | null)[] = [
     input.slug,
@@ -168,10 +185,13 @@ export async function updatePost(
   ];
   if (pinnedExpr === '?') binds.push(pinnedBind ?? null);
   binds.push(input.outcome);
+  binds.push(input.isIntro ? 1 : 0);
   binds.push(input.publishedAt);
   binds.push(id);
 
   await db.prepare(sql).bind(...binds).run();
+
+  if (input.isIntro) await clearOtherIntros(db, id);
 }
 
 export async function deletePost(db: D1Database, id: number): Promise<void> {

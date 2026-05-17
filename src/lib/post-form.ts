@@ -18,6 +18,7 @@ export function parsePostForm(form: FormData): ParseResult {
   const tags = joinList(parseList(String(form.get('tags') ?? '')));
   const draft = form.get('draft') === '1';
   const pinned = form.get('pinned') === '1';
+  const isIntro = form.get('is_intro') === '1';
   const outcomeRaw = String(form.get('outcome') ?? '');
   const outcome: Outcome =
     outcomeRaw === 'profit' ? 'profit' : outcomeRaw === 'loss' ? 'loss' : null;
@@ -39,6 +40,6 @@ export function parsePostForm(form: FormData): ParseResult {
 
   return {
     ok: true,
-    input: { slug, title, description, body, tickers, tags, draft, pinned, outcome, publishedAt },
+    input: { slug, title, description, body, tickers, tags, draft, pinned, isIntro, outcome, publishedAt },
   };
 }

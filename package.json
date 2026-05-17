@@ -19,6 +19,8 @@
     "db:migrate3:remote": "wrangler d1 execute aln-x-stock-db --remote --file=./migrations/003_add_outcome.sql",
     "db:migrate4:local": "wrangler d1 execute aln-x-stock-db --local --file=./migrations/004_add_view_count.sql",
     "db:migrate4:remote": "wrangler d1 execute aln-x-stock-db --remote --file=./migrations/004_add_view_count.sql",
+    "db:migrate5:local": "wrangler d1 execute aln-x-stock-db --local --file=./migrations/005_add_is_intro.sql",
+    "db:migrate5:remote": "wrangler d1 execute aln-x-stock-db --remote --file=./migrations/005_add_is_intro.sql",
     "db:backup": "wrangler d1 export aln-x-stock-db --remote --output=./backups/backup-$(date +%Y%m%d).sql",
     "hash": "node scripts/hash-password.mjs",
     "astro": "astro"

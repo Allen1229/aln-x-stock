@@ -23,11 +23,12 @@ export function daysAgo(d: Date | number): number {
   return Math.floor(diffMs / 86400000);
 }
 
-/** 中文相對日期：今天 / 昨天 / N 天前 */
-export function relativeDateZh(d: Date | number): string {
+/** 中文相對日期：今天 / 昨天 / N 天前；超過 10 天回傳 null（呼叫端可改顯示通用詞） */
+export function relativeDateZh(d: Date | number): string | null {
   const n = daysAgo(d);
   if (n <= 0) return '今天';
   if (n === 1) return '昨天';
   if (n === 2) return '前天';
-  return `${n} 天前`;
+  if (n <= 9) return `${n} 天前`;
+  return null;
 }

@@ -15,6 +15,7 @@ CREATE TABLE posts (
   draft INTEGER NOT NULL DEFAULT 0,
   pinned_at INTEGER,
   outcome TEXT,
+  is_intro INTEGER NOT NULL DEFAULT 0,
   view_count INTEGER NOT NULL DEFAULT 0,
   published_at INTEGER NOT NULL,
   updated_at INTEGER NOT NULL DEFAULT (unixepoch())
