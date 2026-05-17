@@ -72,7 +72,7 @@ const posts = rawPosts.map((post, i) => {
         <article class:list={[
           'border rounded-lg p-5 transition-colors relative',
           post.isIntro
-            ? 'border-amber-400/70 shadow-[0_0_0_1px_rgba(251,191,36,0.18)] hover:border-amber-300 bg-gradient-to-br from-amber-950/25 via-bg-card to-bg-card'
+            ? 'border-[#54ead4]/70 shadow-[0_0_0_1px_rgba(84,234,212,0.20)] hover:border-[#54ead4] bg-gradient-to-br from-[#54ead4]/10 via-bg-card to-bg-card'
             : post.pinned_at
               ? 'border-accent/60 hover:border-accent bg-bg-card'
               : post.isFresh
@@ -86,7 +86,7 @@ const posts = rawPosts.map((post, i) => {
             <div class="flex items-start gap-3 mb-2">
               <h2 class="text-xl font-semibold text-ink flex items-start gap-2 min-w-0 flex-1 leading-snug">
                 {post.isIntro && (
-                  <span class="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold tracking-wider px-1.5 py-0.5 rounded mt-1 bg-amber-400 text-bg">
+                  <span class="shrink-0 inline-flex items-center gap-1 text-[10px] font-bold tracking-wider px-1.5 py-0.5 rounded mt-1 bg-[#54ead4] text-bg">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3">
                       <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 16.8 5.8 21.3l2.4-7.4L2 9.4h7.6z"/>
                     </svg>
