@@ -16,7 +16,7 @@ if (!AD.enabled) return null;
       loading="lazy"
     />
     <div class="flex-1">
-      <h3 class="text-ink font-semibold text-base mb-1">{AD.headline}</h3>
+      <h3 class="text-ink font-semibold text-base mb-1" set:html={AD.headline}></h3>
       <p class="text-ink-mute text-sm leading-relaxed">{AD.body}</p>
     </div>
   </a>

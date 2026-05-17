@@ -32,7 +32,7 @@ export const HERO = {
 export const AD = {
   enabled: true,
   imageUrl: '/ads/main.png',
-  headline: 'iPhone 17 買不到？完成驗證免費抽回家！',
+  headline: 'iPhone 17 買不到？下載遊戲<span class="text-red-500 font-bold">玩星派對</span>，遊玩並完成驗證免費抽回家!',
   body: '進入遊戲遊玩，並完成手機驗證，即有機會獲得 iPhone 17、7-ELEVEN 虛擬商品卡等豐富好禮。',
   linkUrl: 'https://www.gametower.com.tw/Action/partygo/mixytalk0416/index.html?utm_source=aln-x-stock&utm_medium=display&utm_campaign=mega_traffic_2026&utm_content=1st_banner',
 };
