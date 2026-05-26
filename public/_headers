@@ -1,0 +1,25 @@
+# Cloudflare Pages 自動套用的 HTTP 標頭設定
+# 文件：https://developers.cloudflare.com/pages/configuration/headers/
+
+# 後台頁面：完全禁止搜尋引擎收錄與快取
+/admin/*
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex
+  Cache-Control: private, no-store, no-cache, must-revalidate
+  Referrer-Policy: no-referrer
+
+# API 端點：完全禁止收錄
+/api/*
+  X-Robots-Tag: noindex, nofollow, noarchive
+  Cache-Control: private, no-store
+
+# 後台登入頁
+/admin
+  X-Robots-Tag: noindex, nofollow, noarchive, nosnippet, noimageindex
+  Cache-Control: private, no-store, no-cache, must-revalidate
+
+# 全站安全性標頭
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
