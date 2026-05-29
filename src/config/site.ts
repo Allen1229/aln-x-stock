@@ -1,6 +1,6 @@
 // 集中管理網站資訊，未來換網址只需改 SITE_URL 環境變數
 export const SITE = {
-  url: import.meta.env.SITE_URL ?? 'https://aln-x-stock.pages.dev',
+  url: 'https://artiseum.com.tw',
   title: '股海冥燈 - 艾倫大叔',
   shortTitle: '股海冥燈 - 艾倫大叔',
   description: '股票市場上，常常是一個反指標 — 艾倫大叔的台股個股操作紀錄與心得分享，不報明牌，只分享真實的操作與檢討。',
