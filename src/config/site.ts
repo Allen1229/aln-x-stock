@@ -8,7 +8,7 @@ export const SITE = {
   author: '艾倫大叔',
   ogImage: '/hero/main.png',
   locale: 'zh_TW',
-  gtmId: 'GTM-5SL4XJ6V',
+  gtmId: 'GTM-TQRT47NH',
   nav: [
     { href: '/', label: '首頁' },
     { href: '/about', label: '關於' },
